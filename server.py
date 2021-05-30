@@ -3,7 +3,6 @@
 #-*- coding:UTF-8 -*-
 
 import socket, time, subprocess, datetime, mysql.connector
-#pip install mysql-connector-python
 
 
 def timeShutDown(time):
@@ -50,7 +49,7 @@ def parser(stringclient):
 		droniConnessi.remove(str(hostname))
 	# Risposta
 	reply="server_"+stringclient+"_server"
-	
+
 	return reply
 
 
