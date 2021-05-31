@@ -1,15 +1,18 @@
 #!/usr/bin/python
 
-#-*- coding:UTF-8 -*-
+# -*- coding:UTF-8 -*-
 
-import socket, time, random
+import random
+import socket
+import time
+from config import SERVER_HOST, SERVER_PORT
 
 
 def checkConsegna():
     # La funzione dovrebbe rilevare il drone che atterra e 
     # quindi si abbassa di quota ma  non avendo modo di 
     # emularla utilizziamo un random
-    if(random.randint(0, 9)<=2):
+    if random.randint(0, 9) <= 2:
         return True
     else:
         return False
@@ -17,43 +20,40 @@ def checkConsegna():
 
 def getGPS():
     # Generazione casuale del GPS
-    latitudine=str(round(random.uniform(-90.000001, +90.000001), 6))
-    longitudine=str(round(random.uniform(-180.000001, +180.000001), 6))
+    latitudine = str(round(random.uniform(-90.000001, +90.000001), 6))
+    longitudine = str(round(random.uniform(-180.000001, +180.000001), 6))
     # Hostname e ip
-    hostname=socket.gethostname()
-    ip_address=socket.gethostbyname(hostname)
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
     # Condizioni per la localizzazione
-    if(latitudine>="45.443513" and latitudine<="45.443928"):
-        if(longitudine>="12.318577" and longitudine<="12.319442"):
-            reply=latitudine+"#"+longitudine+"#"+"hub"+"#"+str(hostname)+"#"+str(ip_address)
+    if "45.443513" <= latitudine <= "45.443928":
+        if "12.318577" <= longitudine <= "12.319442":
+            reply = f"{latitudine}#{longitudine}#hub#{hostname}#{ip_address}"
         else:
-            reply=latitudine+"#"+longitudine+"#"+"viaggio"+"#"+str(hostname)+"#"+str(ip_address)
+            reply = f"{latitudine}#{longitudine}#viaggio#{hostname}#{ip_address}"
     else:
-        reply=latitudine+"#"+longitudine+"#"+"viaggio"+"#"+str(hostname)+"#"+str(ip_address)
+        reply = f"{latitudine}#{longitudine}#viaggio#{hostname}#{ip_address}"
     # Controllo consegna
-    if(checkConsegna()==True):
-        reply=latitudine+"#"+longitudine+"#"+"consegnato"+"#"+str(hostname)+"#"+str(ip_address)
+    if checkConsegna() is True:
+        reply = f"{latitudine}#{longitudine}#consegnato#{hostname}#{ip_address}"
 
     return reply
 
 
-host="127.0.0.1"
-port=12555
+reply = ""
 
-reply=""
-
-while(reply!="Spegni"):
+while reply != "Spegni":
     # Connessione
-    s=socket.socket()
-    s.connect((host, port))
+    s = socket.socket()
+    s.connect((SERVER_HOST, SERVER_PORT))
     # Invio
     s.send(getGPS().encode())
     # Ricezione
-    reply=s.recv(1024).decode()
+    reply = s.recv(1024).decode()
     print(reply)
     # Chiusura
     s.close()
     # Time out
-    time.sleep(100)
+    time.sleep(10)
 
 print("Terminato")
